@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa CEP</title>
+</head>
+<body>
+    <h1>Pesquisa de Endereço e CEP</h1>
+    
+    <div>
+        <label for="option">Escolha uma opção:</label>
+        <select id="option">
+            <option value="1">Pesquisa por CEP</option>
+            <option value="2">Pesquisa por Endereço</option>
+        </select>
+    </div>
+    
+    <div id="cep-search" style="display: none;">
+        <label for="cep">Digite o CEP:</label>
+        <input type="text" id="cep" />
+        <button onclick="searchByCep()">Pesquisar</button>
+    </div>
+    
+    <div id="address-search" style="display: none;">
+        <label for="uf">Digite a UF:</label>
+        <input type="text" id="uf" />
+        <label for="cidade">Digite a Cidade:</label>
+        <input type="text" id="cidade" />
+        <label for="endereco">Digite o Endereço:</label>
+        <input type="text" id="endereco" />
+        <button onclick="searchByAddress()">Pesquisar</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        const optionSelect = document.getElementById("option");
+        const cepSearch = document.getElementById("cep-search");
+        const addressSearch = document.getElementById("address-search");
+
+        optionSelect.addEventListener("change", function() {
+            if (this.value == "1") {
+                cepSearch.style.display = "block";
+                addressSearch.style.display = "none";
+            } else if (this.value == "2") {
+                cepSearch.style.display = "none";
+                addressSearch.style.display = "block";
+            }
+        });
+
+        function searchByCep() {
+            const cep = document.getElementById("cep").value.replace(/\s|\-|\.|\//g, "");
+            if (cep.length === 8) {
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+                    })
+                    .catch(error => {
+                        document.getElementById("result").innerText = "Erro ao buscar CEP.";
+                    });
+            } else {
+                alert("CEP inválido!");
+            }
+        }
+
+        function searchByAddress() {
+            const uf = document.getElementById("uf").value;
+            const cidade = document.getElementById("cidade").value;
+            const endereco = document.getElementById("endereco").value;
+            fetch(`https://viacep.com.br/ws/${uf}/${cidade}/${endereco}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById("result").innerText = "Erro ao buscar endereço.";
+                });
+        }
+    </script>
+</body>
+</html>
